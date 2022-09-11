@@ -16,8 +16,10 @@ public class PlayerControllerX : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip moneySound;
     public AudioClip explodeSound;
+    public AudioClip groundSound;
 
-    private float upLimit = 16.0f, downLimit = 2f;
+    private float upLimit = 16.0f;
+    bool tooHigh;
 
 
     // Start is called before the first frame update
@@ -35,20 +37,19 @@ public class PlayerControllerX : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // While space is pressed and player is low enough, float up
-        if (Input.GetKey(KeyCode.Space) && !gameOver)
-        {
-            playerRb.AddForce(Vector3.up * floatForce);
-        }
-
-        //do not go beyond
         if (transform.position.y >= upLimit)
         {
-            
+            tooHigh = true;
         }
-        else if(transform.position.y <= downLimit)
+        else
         {
+            tooHigh = false;
+        }
 
+        // While space is pressed and player is low enough, float up
+        if (Input.GetKey(KeyCode.Space) && !gameOver && !tooHigh)
+        {
+            playerRb.AddForce(Vector3.up * floatForce);
         }
     }
 
@@ -71,6 +72,11 @@ public class PlayerControllerX : MonoBehaviour
             playerAudio.PlayOneShot(moneySound, 1.0f);
             Destroy(other.gameObject);
 
+        }
+        else if(other.gameObject.CompareTag("Ground"))
+        {
+            playerAudio.PlayOneShot(groundSound, 1.0f);
+            playerRb.AddForce(Vector3.up * 10, ForceMode.Impulse);
         }
 
     }
